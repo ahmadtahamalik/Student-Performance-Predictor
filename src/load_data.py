@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 # Load the student performance dataset , sep =";" is used to separate for this specific dataset
 data = pd.read_csv("data/student-mat.csv", sep=";")
@@ -220,3 +221,91 @@ plt.ylabel("Average G3")
 plt.title("Average G3 by Extra Paid Classes")
 
 plt.show()
+
+# Define X and Y 
+
+X = data.drop("G3", axis=1)
+Y = data["G3"]
+
+print("X shape:", X.shape)
+print("Y shape:", Y.shape)
+
+# We want the model to make predictions for students whose G3 it hasn't seen during training.
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X,
+    Y,
+    test_size=0.2,
+    random_state=42
+)
+
+print("X_train shape:", X_train.shape)
+print("X_test shape", X_test.shape)
+print("Y_train shape", Y_train.shape)
+print("Y_test shape", Y_test.shape)
+
+# Separate numerical and categorical features to prepare them for ML preprocessing
+
+categorical_features = X.select_dtypes(include="str").columns.tolist()
+numerical_features = X.select_dtypes(include="number").columns.tolist()
+
+print("Categorical columns:")
+print(categorical_features)
+
+print("\nNumerical columns:")
+print(numerical_features)
+
+# Creating a preprocessing pipeline to encode categorical features while keeping numerical features
+
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+# Create preprocessing pipeline for numerical and categorical features
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("categorical", OneHotEncoder(handle_unknown="ignore"), categorical_features),
+        ("numerical", StandardScaler(), numerical_features)
+    ]
+)
+
+# Fit preprocessing on training data and transform both training and test data
+
+X_train_processed = preprocessor.fit_transform(X_train)
+X_test_processed = preprocessor.transform(X_test)
+
+print("X_train_processed:", X_train_processed.shape)
+print("X_test_processed:", X_test_processed.shape)
+
+# Get the names of all the features before preprocessing
+feature_names = preprocessor.get_feature_names_out()
+
+print("Number of processed feature:", len(feature_names))
+print("\nProcessed feature names:")
+print(feature_names)
+
+# Check the processed training and test data 
+
+print("Processed training data shape:",X_train_processed.shape)
+print("Processed test data shape:", X_test_processed.shape)
+
+print("\n Data type of processed training data:")
+print(type(X_train_processed))
+
+print("\nContains NaN values:")
+print(np.isnan(X_train_processed.toarray()).any() if hasattr(X_train_processed, "toarray") else np.isnan(X_train_processed).any())
+
+# Final Check before model training 
+
+print("Final training data shape:", X_train_processed.shape)
+print("Final test data shape:", X_test_processed.shape)
+
+print("\nTraining target shape:",Y_train.shape)
+print("Test target shape:", Y_test.shape)
+
+print("\n Number of Processed features:",len(feature_names))
+
+print("\nFirst 10 processed feature names:")
+print(feature_names[:10])
