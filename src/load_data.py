@@ -309,3 +309,92 @@ print("\n Number of Processed features:",len(feature_names))
 
 print("\nFirst 10 processed feature names:")
 print(feature_names[:10])
+
+from sklearn.linear_model import LinearRegression
+
+# Create the baseline Linear Regression model 
+model = LinearRegression()
+
+# Train the Linear Regression model using the training data
+model.fit(X_train_processed,Y_train)
+print("Model training completed.")
+
+# Make predictions on the unseen test data 
+
+y_pred = model.predict(X_test_processed)
+
+print("First 10 predicted G3 values:")
+print(y_pred[:10])
+
+print("\nFirst 10 actual G3 values:")
+print(Y_test.iloc[:10].values)
+
+from sklearn.metrics import mean_absolute_error
+
+# Calculate the Mean Absolute Error
+mae = mean_absolute_error(Y_test,y_pred)
+print("Mean Absolute Error (MAE):", mae)
+
+from sklearn.metrics import root_mean_squared_error
+
+# Calculate the Root Mean Squared Error 
+rmse = root_mean_squared_error(Y_test,y_pred)
+print("Root Mean Squared Error (RMSE):", rmse)
+
+from sklearn.metrics import r2_score
+
+# Calculate the R^2 score
+r2 = r2_score(Y_test,y_pred)
+print("R^2 Score:", r2)
+
+# Display all evaluation metrics for the baseline model 
+
+print("\n--- Linear Regression ---")
+print("MAE :", mae)
+print("RMSE:", rmse)
+print("R^2:", r2)
+
+import matplotlib.pyplot as plt 
+
+# Plot actual G3 values agaisnt prediceted G3 values 
+plt.figure(figsize=(8,6))
+
+plt.scatter(Y_test,y_pred)
+
+plt.xlabel("Actual G3")
+plt.ylabel("Predicted G3")
+plt.title("Actual vs Predicted G3")
+
+plt.plot([0,20], [0,20], linestyle="--")
+
+plt.show()
+
+# Find the students with the largest prediction errors
+
+errors = abs(Y_test - y_pred)
+
+error_analysis = pd.DataFrame({
+    "Actual_G3": Y_test.values,
+    "Predicted_G3": y_pred,
+    "Absolute_Error": errors.values
+})
+
+error_analysis = error_analysis.sort_values(
+    by="Absolute_Error",
+    ascending=False
+)
+
+print("Students with the largest prediction errors:")
+print(error_analysis.head(10))
+
+# Store the baseline model evaluation results
+
+baseline_results = {
+    "Model": "Linear Regression",
+    "MAE": mae,
+    "RMSE": rmse,
+    "R2": r2
+}
+
+print("\nBaseline Model Results:")
+print(baseline_results)
