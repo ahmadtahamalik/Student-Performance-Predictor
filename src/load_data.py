@@ -398,3 +398,114 @@ baseline_results = {
 
 print("\nBaseline Model Results:")
 print(baseline_results)
+
+from sklearn.linear_model import Ridge
+
+# Create the Ridge Regression model 
+ridge_model = Ridge(alpha=1.0)
+
+# Train the model 
+ridge_model.fit(X_train_processed,Y_train)
+
+# Make the predictions
+ridge_pred = ridge_model.predict(X_test_processed)
+
+print("\nRidge Regression predictions created.")
+
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
+
+# Evaluate Ridge Regression 
+ridge_mae = mean_absolute_error(Y_test,ridge_pred)
+ridge_rmse = root_mean_squared_error(Y_test,ridge_pred)
+ridge_r2 = r2_score(Y_test, ridge_pred)
+
+print("\n--- Ridge Regression Evaluation ---")
+print("MAE:", ridge_mae)
+print("RMSE:", ridge_rmse)
+print("R^2:", ridge_r2)
+
+
+# Compare baseline models 
+
+model_comparison = pd.DataFrame({
+    "Model": ["Linear Regression","Ridge Regression"],
+    "MAE": [mae,ridge_mae],
+    "RMSE": [rmse, ridge_rmse],
+    "R2": [r2, ridge_r2]
+})
+
+print("\n--- Model Comparison ---")
+print(model_comparison)
+
+# Compare model errors
+
+import matplotlib.pyplot as plt 
+
+model_comparison.set_index("Model")[["MAE","RMSE"]].plot(
+    kind="bar",
+    figsize=(8,5)
+)
+plt.title("Model Error Comparison")
+plt.ylabel("Error")
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+# Compare R^2 scores
+
+model_comparison.set_index("Model")[["R2"]].plot(
+    kind="bar",
+    figsize=(8, 5)
+)
+
+plt.title("R^2 Score Comparison")
+plt.ylabel("R^2 Score")
+plt.xticks(rotation=0)
+plt.show()
+
+from sklearn.model_selection import cross_val_score
+
+# Perform 5-field cross-validation for Ridge Regression 
+ridge_cv_scores = cross_val_score(
+    ridge_model,
+    X_train_processed,
+    Y_train,
+    cv=5,
+    scoring="neg_mean_absolute_error"
+)
+
+# Convert negative MAE scores to positive values
+ridge_cv_mae = -ridge_cv_scores
+
+print("\n--- Ridge Cross-Validation---")
+print("MAE for each fold:", ridge_cv_mae)
+print("Mean CV MAE:",ridge_cv_mae.mean())
+
+# Perform 5-fold cross_validation for Linear Regression 
+linear_cv_scores = cross_val_score(
+    model,
+    X_train_processed,
+    Y_train,
+    cv=5,
+    scoring="neg_mean_absolute_error"
+)
+
+# Convert Negative MAE scores to positive values
+linear_cv_mae = -linear_cv_scores
+
+print("\n--- Linear Regression Cross-Validation---")
+print("MAE for each fold:", linear_cv_mae)
+print("Mean CV MAE:", linear_cv_mae.mean())
+
+# Compare cross-validation MAE
+
+cv_comparison = pd.DataFrame({
+    "Model":["Linear Regression","Ridge Regression"],
+    "Mean_CV_MAE":[
+        linear_cv_mae.mean(),
+        ridge_cv_mae.mean()
+    ]
+})
+
+print("\n--- Cross-Validation Comparison---")
+print(cv_comparison)
