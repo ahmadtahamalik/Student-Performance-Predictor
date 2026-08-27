@@ -509,3 +509,105 @@ cv_comparison = pd.DataFrame({
 
 print("\n--- Cross-Validation Comparison---")
 print(cv_comparison)
+
+from sklearn.model_selection import GridSearchCV
+
+# Values of alpha we want to test 
+alpha_values = {
+    "alpha": [0.01, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0]   
+}
+
+# Create GridSearchCV for Ridge Regression 
+ridge_grid = GridSearchCV(
+    Ridge(),
+    alpha_values,
+    cv=5,
+    scoring="neg_mean_absolute_error"
+)
+
+# Train and evaluate different alpha values 
+ridge_grid.fit(X_train_processed, Y_train)
+
+print("\nBest Ridge aplha:")
+print(ridge_grid.best_params_)
+
+print("\nBest Cross-Validation MAE:")
+print(-ridge_grid.best_score_)
+
+# Get the best Ridge Model found by GridSearchCV
+best_ridge_model = ridge_grid.best_estimator_
+
+# Make predictions on the the unseen test data
+best_ridge_pred = best_ridge_model.predict(X_test_processed)
+
+# Evaluate the tuned Ridge Model 
+best_ridge_mae = mean_absolute_error(Y_test,best_ridge_pred)
+best_ridge_rmse = root_mean_squared_error(Y_test,best_ridge_pred)
+best_ridge_r2 = r2_score(Y_test,best_ridge_pred)
+
+print("\n --- Tuned Ridge Regressino Evaluation ---")
+print("MAE:", best_ridge_mae)
+print("RMSE", best_ridge_rmse)
+print("R^2:", best_ridge_r2)
+
+# Add the tuned Ridge model to our model comparison 
+
+model_comparison= pd.DataFrame({
+    "Model": [ 
+        "Linear Regression",
+        "Ridge Regression",
+        "Tuned Ridge Regression"
+    ],
+    "MAE": [
+        mae,
+        ridge_mae,
+        best_ridge_mae
+    ],
+    "RMSE": [
+        rmse,
+        ridge_rmse,
+        best_ridge_rmse
+    ],
+    "R2": [
+        r2,
+        ridge_r2,
+        best_ridge_r2
+    ]
+})
+
+print("\n --- Updated Model Leaderboard --- ")
+print(model_comparison)
+
+from sklearn.ensemble import RandomForestRegressor
+
+# Create the Random Forest model 
+random_forest_model = RandomForestRegressor(
+    n_estimators=200,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Train the model 
+random_forest_model.fit(X_train_processed, Y_train)
+
+print("\n Random Forest model trained successfully")
+
+print("\n--- Ridge Improvement ---")
+
+print("Original Ridge MAE:", ridge_mae)
+print("Tuned Ridge MAE:  ", best_ridge_mae)
+
+print("Original Ridge RMSE:", ridge_rmse)
+print("Tuned Ridge RMSE:  ", best_ridge_rmse)
+
+print("Original Ridge R²:", ridge_r2)
+print("Tuned Ridge R²:  ", best_ridge_r2)
+
+# Find the model with the lowest MAE
+
+best_model = model_comparison.loc[
+    model_comparison["MAE"].idxmin()
+]
+
+print("\n --- Best Model So Far ---")
+print(best_model)
