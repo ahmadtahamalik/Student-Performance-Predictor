@@ -611,3 +611,129 @@ best_model = model_comparison.loc[
 
 print("\n --- Best Model So Far ---")
 print(best_model)
+
+
+from sklearn.ensemble import RandomForestRegressor
+
+# Create Random Forest model 
+random_forest_model = RandomForestRegressor(
+    n_estimators=200,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Train the model 
+random_forest_model.fit(X_train_processed, Y_train)
+
+print("\n Random Forest model trained successfully.")
+
+
+# Make predictions on the test set 
+random_forest_pred = random_forest_model.predict(X_test_processed)
+
+print("\nRandom Forest predictions created successfully")
+
+# Evaluate Random Forest 
+random_forest_mae = mean_absolute_error(Y_test,random_forest_pred)
+random_forest_rmse = root_mean_squared_error(Y_test,random_forest_pred)
+random_forest_r2 = r2_score(Y_test,random_forest_pred)
+
+print("\n--- Random Forest Evaluation ---")
+print("MAE :", random_forest_mae)
+print("RMSE :", random_forest_rmse)
+print("R^2 :", random_forest_r2)
+
+
+# Add Random Forest to the model comparison
+
+model_comparison = pd.DataFrame({
+    "Model": [
+        "Linear Regression",
+        "Ridge Regression",
+        "Tuned Ridge Regression",
+        "Random Forest"
+    ],
+    "MAE": [
+        mae,
+        ridge_mae,
+        best_ridge_mae,
+        random_forest_mae
+    ],
+    "RMSE": [
+        rmse,
+        ridge_rmse,
+        best_ridge_rmse,
+        random_forest_rmse
+    ],
+    "R2": [
+        r2,
+        ridge_r2,
+        best_ridge_r2,
+        random_forest_r2
+    ]
+})
+
+print("\n--- Model Leaderboard ---")
+print(model_comparison)
+
+print("\n--- Model Leaderboard ---")
+print(model_comparison)
+
+# Find the model with the lowest MAE 
+
+best_model = model_comparison.loc[
+    model_comparison["MAE"].idxmin()
+]
+
+print("\n --- Best Model so Far ---")
+print("Model:", best_model["Model"])
+print("MAE:", best_model["MAE"])
+print("RMSE:", best_model["RMSE"])
+print("R^2:", best_model["R2"])
+
+# Get feature importance from Random Forest
+
+feature_importance = pd.DataFrame({
+    "Feature": preprocessor.get_feature_names_out(),
+    "Importance": random_forest_model.feature_importances_
+})
+
+# Sort from most important to least important
+feature_importance = feature_importance.sort_values(
+    by="Importance",
+    ascending=False
+)
+
+print("\n--- Top 15 Important Features ---")
+print(feature_importance.head(15))
+
+# Visualize the top 15 feature importances 
+
+# Get the top 15 features
+top_features = feature_importance.head(15).sort_values(
+    by="Importance"
+)
+
+# Visualize the top 15 feature importances
+plt.figure(figsize=(10, 6))
+
+plt.barh(
+    top_features["Feature"],
+    top_features["Importance"]
+)
+
+plt.xlabel("Importance")
+plt.ylabel("Feature")
+plt.title("Top 15 Feature Importances - Random Forest")
+
+plt.tight_layout()
+plt.show()
+
+# Save feature importance results
+
+feature_importance.to_csv(
+    "data/processed/feature_importance.csv",
+    index=False
+)
+
+print("\nFeature importance saved successfully.")

@@ -1,0 +1,75 @@
+Subject: Contact Us Form – Troubleshooting Summary
+
+Hi Maya,
+
+I reviewed the client’s Contact Us form and identified that the main issue was that the <form> element did not specify an action or method, so the browser had no defined destination or submission method for the form data. The email field also did not have a name attribute, which is needed to identify the submitted email value. I used AI to analyse the code, explain the likely cause, and suggest a corrected version. I then tested the updated HTML locally by opening it in a web browser, checking that the form loaded correctly, testing the required fields, and submitting sample information. The form successfully triggered the submission process; however, a real backend endpoint would still be required for the data to be received and processed.
+
+The corrected code is:
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <title>Contact Us</title>
+
+</head>
+
+<body>
+
+
+
+  <h2>Contact Us</h2>
+
+
+
+  <form action="/submit-contact" method="POST">
+
+
+
+    <label for="name">Name:</label>
+
+    <input type="text" id="name" name="name" required>
+
+    <br><br>
+
+
+
+    <label for="email">Email:</label>
+
+    <input type="email" id="email" name="email" required>
+
+    <br><br>
+
+
+
+    <label for="message">Message:</label>
+
+    <textarea id="message" name="message" required></textarea>
+
+    <br><br>
+
+
+
+    <button type="submit">Send</button>
+
+
+
+  </form>
+
+
+
+</body>
+
+</html>
+
+
+
+The /submit-contact URL is an example endpoint and would need to be replaced with the client’s actual backend/API endpoint. Overall, AI helped me quickly understand the issue and validate the changes without needing extensive web-development knowledge.
+
+Kind regards,
+
+ [Your Name]
+
+ 
