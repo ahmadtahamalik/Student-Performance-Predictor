@@ -1,5 +1,9 @@
 import pandas as pd
 import numpy as np
+import joblib
+import os
+
+os.makedirs("models",exist_ok=True)
 
 # Load the student performance dataset , sep =";" is used to separate for this specific dataset
 data = pd.read_csv("data/student-mat.csv", sep=";")
@@ -49,7 +53,7 @@ for number, coloumn in enumerate(data.columns, start= 1):
 
 # Separate features(X) and target(Y)
 
-X = data.drop(columns=["G3"])
+X = data.drop(columns=["G3","G2"])
 Y = data["G3"]
 
 print("\nFeatures (X) shape:")
@@ -224,7 +228,7 @@ plt.show()
 
 # Define X and Y 
 
-X = data.drop("G3", axis=1)
+X = data.drop(["G3", "G2"], axis=1)
 Y = data["G3"]
 
 print("X shape:", X.shape)
@@ -272,8 +276,12 @@ preprocessor = ColumnTransformer(
 )
 
 # Fit preprocessing on training data and transform both training and test data
-
 X_train_processed = preprocessor.fit_transform(X_train)
+
+# Save the fitted preprocessor
+joblib.dump(preprocessor, "models/preprocessor.pkl")
+print("Preprocessor saved successfully.")
+
 X_test_processed = preprocessor.transform(X_test)
 
 print("X_train_processed:", X_train_processed.shape)
@@ -587,6 +595,36 @@ random_forest_model = RandomForestRegressor(
     n_jobs=-1
 )
 
+from sklearn.model_selection import GridSearchCV
+
+# Random Forest hyperparameter tuning
+rf_param_grid = {
+    "n_estimators":[100,200,300],
+    "max_depth":[None,12,20],
+    "min_samples_leaf":[1,2,4]
+}
+
+rf_grid = GridSearchCV(
+    RandomForestRegressor(
+        random_state=42,
+        n_jobs=-1
+    ),
+    param_grid=rf_param_grid,
+    cv=5,
+    scoring="neg_mean_absolute_error",
+    n_jobs=-1
+)
+
+rf_grid.fit(X_train_processed,Y_train)
+
+print("\n --- Random Forest Tuning ---")
+print("Best Paramters:")
+print(rf_grid.best_params_)
+
+print("\nBest Cross-Validation MAE:")
+print(-rf_grid.best_score_)
+
+
 # Train the model 
 random_forest_model.fit(X_train_processed, Y_train)
 
@@ -612,15 +650,6 @@ best_model = model_comparison.loc[
 print("\n --- Best Model So Far ---")
 print(best_model)
 
-
-from sklearn.ensemble import RandomForestRegressor
-
-# Create Random Forest model 
-random_forest_model = RandomForestRegressor(
-    n_estimators=200,
-    random_state=42,
-    n_jobs=-1
-)
 
 # Train the model 
 random_forest_model.fit(X_train_processed, Y_train)
@@ -737,3 +766,49 @@ feature_importance.to_csv(
 )
 
 print("\nFeature importance saved successfully.")
+
+# Check the correlation between G2 and G3 
+
+g2_g3_correlation = data["G2"].corr(data["G3"])
+
+print("\n --- G2 vs G3 Correlation ---")
+print("Correlation:",g2_g3_correlation)
+
+# Best tuned Random Forest
+best_rf = rf_grid.best_estimator_
+
+# Predictions on the held-out set 
+best_rf_pred = best_rf.predict(X_test_processed)
+
+# Evaluation 
+best_rf_mae = mean_absolute_error(Y_test,best_rf_pred)
+best_rf_rmse = root_mean_squared_error(Y_test,best_rf_pred)
+best_rf_r2 = r2_score(Y_test,best_rf_pred)
+
+print("\n --- Tuned Random Forest Evaluation ---")
+print("MAE:", best_rf_mae)
+print("RMSE:", best_rf_rmse)
+print("R^2:",best_rf_r2)
+
+# Add Tuned Randome Forest to the model leaderboard
+
+tuned_rf_result = pd.DataFrame([{
+    "Model": "Tuned Random Forest",
+    "MAE": best_rf_mae,
+    "RMSE": best_rf_rmse,
+    "R2": best_rf_r2
+}])
+
+model_comparison = pd.concat(
+    [model_comparison, tuned_rf_result],
+    ignore_index=True
+)
+
+print("\n--- Final Model Leaderboard ---")
+print(model_comparison.sort_values("MAE"))
+
+
+# Save the final Random Forest model
+joblib.dump(best_rf, "models/random_forest_model.pkl")
+print("\nFinal Random Forest model saved successfully.")
+
