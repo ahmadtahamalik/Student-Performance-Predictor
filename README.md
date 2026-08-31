@@ -264,3 +264,42 @@ student-performance-predictor/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+
+
+▶️ How to Run the Application
+
+To run the Student Performance Predictor locally, follow these steps:
+
+1. Clone the repository:
+git clone YOUR_GITHUB_REPOSITORY_URL
+cd student-performance-predictor.
+
+2. Install the required dependencies:
+pip install -r requirements.txt
+
+3. Start the Streamlit application:
+streamlit run app.py
+
+The application will open in your web browser. If it does not open automatically, Streamlit will provide a local URL such as:
+
+http://localhost:8501
+
+📌 Important
+
+The application should be launched using:
+
+streamlit run app.py
+
+rather than:
+
+python app.py
+
+because the application is built using Streamlit.
+
+Make sure the saved machine-learning files are also present in the models/ directory:
+
+models/
+├── preprocessor.pkl
+└── random_forest_model.pkl
+
+That's all the user needs to know to run your project locally.
