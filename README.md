@@ -1,62 +1,228 @@
 # 🎓 Student Performance Predictor
 
-A machine-learning project that analyzes student data and predicts academic performance using Python and Scikit-learn.
+A machine-learning application that predicts a student's final academic performance using demographic, academic, family, social, and lifestyle information.
+
+The project covers the complete machine-learning workflow, from data exploration and preprocessing to model training, evaluation, and deployment through an interactive Streamlit application.
+
+---
 
 ## 📌 Project Overview
 
-The objective of this project is to understand and apply the complete machine-learning workflow, including:
+The objective of this project was to investigate whether information about a student's academic background, family environment, school situation, and lifestyle can be used to estimate their final academic performance.
+
+The project follows a complete machine-learning workflow:
 
 - Data collection
-- Data cleaning
+- Data cleaning and exploration
 - Exploratory data analysis
 - Feature preprocessing
 - Model training
 - Model evaluation
+- Model selection
+- Model saving
 - Application development
-- Deployment
+- Interactive prediction
+- Deployment preparation
 
-The project will investigate whether academic, social and school-related factors can help predict a student’s final academic performance.
+The final application allows users to enter student information and receive an estimated final grade.
+
+---
 
 ## 🎯 Project Objectives
 
-- Explore and understand student-performance data
-- Identify factors related to academic outcomes
-- Visualize important patterns in the dataset
-- Prepare numerical and categorical data for machine learning
-- Build classification models to predict pass or fail
-- Build regression models to estimate final grades
-- Compare the performance of different algorithms
-- Create an interactive Streamlit application
-- Document the complete development process
+The main objectives of the project are:
 
-## 🤖 Machine-Learning Tasks
+- Understand and explore student-performance data
+- Identify patterns and relationships between student characteristics and academic performance
+- Analyse numerical and categorical features
+- Prepare data for machine learning
+- Train and compare machine-learning models
+- Predict a student's final academic grade
+- Determine whether the predicted grade indicates a pass or fail
+- Build an interactive user interface using Streamlit
+- Create a reproducible and well-documented machine-learning project
 
-### ✅ Classification
+---
 
-The classification models will predict whether a student is likely to:
-
-- Pass
-- Fail
+## 🤖 Machine-Learning Approach
 
 ### 📈 Regression
 
-The regression models will estimate the student’s final grade.
+The main prediction task is **regression**.
 
-## 🧠 Planned Models
+The model estimates the student's final grade:
 
-### Classification Models
+**G3 — Final Grade**
 
-- Logistic Regression
-- Decision Tree Classifier
-- Random Forest Classifier
+The predicted grade is presented to the user through the Streamlit application.
 
-### Regression Models
+The application also provides a simple interpretation:
 
-- Linear Regression
-- Decision Tree Regressor
-- Random Forest Regressor
+- **G3 ≥ 10 → PASS**
+- **G3 < 10 → FAIL**
 
-## 🛠️ Technologies
+This threshold follows the grading scale used in the original dataset.
+
+---
+
+## 🧠 Machine-Learning Model
+
+The final Streamlit application uses a:
+
+**Random Forest Regressor**
+
+The trained model is stored in the `models/` directory together with the preprocessing pipeline.
+
+The preprocessing pipeline ensures that the input provided through the application is transformed in the same way as the training data before being passed to the model.
+
+---
+
+## 📊 Model Performance
+
+During model development, different regression approaches were evaluated.
+
+The final model achieved approximately:
+
+- **MAE:** 1.64
+- **RMSE:** 2.37
+- **R²:** 0.73
+
+These metrics indicate that the model is able to capture a substantial portion of the variation in final student grades.
+
+However, the predictions should be interpreted as estimates rather than guaranteed outcomes.
+
+---
+
+## 📚 Dataset
+
+This project uses the **Student Performance dataset** from the UCI Machine Learning Repository.
+
+The dataset contains information about students':
+
+- Academic performance
+- Demographic characteristics
+- Family background
+- School information
+- Social activities
+- Lifestyle
+- Study habits
+
+The main target variable is:
+
+**G3 — Final Grade**
+
+The original dataset was collected from two Portuguese secondary schools.
+
+Dataset source:
+
+https://archive.ics.uci.edu/dataset/320/student+performance
+
+---
+
+## ⚠️ Dataset Limitations
+
+The model was trained using data from the original UCI Student Performance dataset.
+
+Therefore, the model has learned patterns from the students represented in that dataset.
+
+Predictions may not generalize equally well to:
+
+- Students from other schools
+- Students from other countries
+- Different education systems
+- Different grading systems
+- Populations with different demographic or social characteristics
+
+The application should therefore be considered an **educational machine-learning project and prediction tool**, rather than a definitive assessment of a student's future academic performance.
+
+---
+
+## 🖥️ Streamlit Application
+
+The project includes an interactive web application built with **Streamlit**.
+
+Users can enter information such as:
+
+### Student Information
+
+- School
+- Sex
+- Age
+- Address
+- Family size
+- Parent status
+- Mother's education
+- Father's education
+- Mother's occupation
+- Father's occupation
+- Reason for choosing school
+- Guardian
+
+### Academic & Support Information
+
+- Travel time
+- Study time
+- Previous failures
+- School support
+- Family support
+- Extra paid classes
+- Extra-curricular activities
+- Nursery attendance
+- Desire for higher education
+- Internet access
+- Romantic relationship
+- Family relationship quality
+
+### Lifestyle Information
+
+- Free time
+- Going out
+- Weekday alcohol consumption
+- Weekend alcohol consumption
+- Health status
+- Absences
+- First-period grade (G1)
+
+After entering the information, the application generates an estimated final G3 grade.
+
+---
+
+## 🔎 Understanding Dataset Codes
+
+Some variables in the original UCI dataset are represented using numerical or abbreviated categorical values.
+
+For example:
+
+### Mother's / Father's Education
+
+- `0` — No education
+- `1` — Primary education
+- `2` — 5th–9th grade
+- `3` — Secondary education
+- `4` — Higher education
+
+### Address
+
+- `U` — Urban
+- `R` — Rural
+
+### Family Size
+
+- `GT3` — Greater than 3 people
+- `LE3` — 3 or fewer people
+
+### Parent Status
+
+- `T` — Living together
+- `A` — Living apart
+
+These values are retained because they correspond to the original dataset representation required by the trained preprocessing pipeline and model.
+
+The Streamlit application provides explanations for these values to make the interface easier to understand.
+
+---
+
+## 🛠️ Technologies Used
 
 - Python
 - Pandas
@@ -65,32 +231,36 @@ The regression models will estimate the student’s final grade.
 - Scikit-learn
 - Jupyter Notebook
 - Streamlit
+- Joblib
 - Git
 - GitHub
 
-## 📊 Dataset
+---
 
-The project will use the Student Performance dataset from the UCI Machine Learning Repository.
-
-The dataset contains academic, demographic, social and school-related information collected from students.
-
-The final grade column, `G3`, will be used as the main prediction target.
-
-Dataset source:
-
-https://archive.ics.uci.edu/dataset/320/student+performance
-
-## 📁 Planned Project Structure
+## 📁 Project Structure
 
 ```text
 student-performance-predictor/
 │
-├── data/              # Dataset files
-├── images/            # Charts and application screenshots
-├── models/            # Saved machine-learning models
-├── notebooks/         # Data analysis and model experiments
-├── src/               # Reusable Python source code
-├── app.py             # Streamlit application
-├── requirements.txt   # Project dependencies
+├── data/
+│   └── Dataset files
+│
+├── images/
+│   └── Charts and application screenshots
+│
+├── models/
+│   ├── preprocessor.pkl
+│   └── random_forest_model.pkl
+│
+├── notebooks/
+│   └── Machine-learning experiments and analysis
+│
+├── src/
+│   ├── load_data.py
+│   ├── predict.py
+│   └── text.txt
+│
+├── app.py
+├── requirements.txt
 ├── .gitignore
 └── README.md
